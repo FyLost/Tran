@@ -31,7 +31,7 @@ pub fn show(panel: &WebviewWindow, content: String) -> Result<()> {
     // Translate the content and send it to the front end display event
     let sander = panel.clone();
     tauri::async_runtime::spawn(async move {
-        let result = translate(&content).await;
+        let result = translate(content).await;
         sander
             .emit::<R<TransVO>>("show", result.into())
             .expect("Failed to emit show event");
