@@ -141,14 +141,14 @@ pub fn handler(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
 
                 let now = util::now();
 
-                if now > fast + 500 {
+                if now > fast + 200 {
                     fast = 0;
                     return;
                 }
                 fast = 0;
 
                 let old = double;
-                if now < old + 1000 {
+                if now < old + 400 {
                     key_s.send(()).expect("Channel send failed");
                     double = 0;
                 } else {
