@@ -31,7 +31,7 @@ fn handle_newlines(content: &mut String, lang: Language) {
         Language::Chinese => "",
         Language::English => " ",
     };
-    
+
     // 首先处理 \r\n
     // First deal with \r\n
     let newlines: Vec<usize> = content.match_indices("\r\n").map(|m| m.0).collect();
@@ -50,7 +50,13 @@ fn handle_newlines(content: &mut String, lang: Language) {
     // 从后往前替换，以免替换过程中改变未替换的换行符的位置
     // Replace in reverse order in order not to change the positions of other newlines during replacements
     for i in single_newlines.iter().rev() {
-        content.replace_range(*i..*i + 2, to_replace);
+        // 如果换行前面是“-”则不需要空格
+        // If there is a "-" before newline then space is not needed
+        if *i > 0 && content.as_bytes()[*i - 1] == b'-' {
+            content.replace_range(*i..*i + 2, "");
+        } else {
+            content.replace_range(*i..*i + 2, to_replace);
+        }
     }
 
     // 处理 \n （仅当没有找到 \r\n 时）
@@ -72,7 +78,13 @@ fn handle_newlines(content: &mut String, lang: Language) {
         // 从后往前替换，以免替换过程中改变未替换的换行符的位置
         // Replace in reverse order in order not to change the positions of other newlines during replacements
         for i in single_newlines.iter().rev() {
-            content.replace_range(*i..*i + 1, to_replace);
+            // 如果换行前面是“-”则不需要空格
+            // If there is a "-" before newline then space is not needed
+            if *i > 0 && content.as_bytes()[*i - 1] == b'-' {
+                content.replace_range(*i..*i + 1, "");
+            } else {
+                content.replace_range(*i..*i + 1, to_replace);
+            }
         }
     }
 }
