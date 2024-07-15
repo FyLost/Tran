@@ -86,5 +86,34 @@ fn handle_newlines(content: &mut String, lang: Language) {
                 content.replace_range(*i..*i + 1, to_replace);
             }
         }
+
+        // 处理 \r （如果没有找到 \n）
+        // Deal with \r (If \n is not found)
+        if newlines.is_empty() {
+            let newlines: Vec<usize> = content.match_indices("\r").map(|m| m.0).collect();
+            let mut single_newlines = Vec::new();
+            for (n, newline) in newlines.iter().enumerate() {
+                // 如果某个换行符前后还有换行符, 则不是单个的换行符
+                // If a newline has another newline before or after it, it is not a single newline
+                if n > 0 && newlines[n - 1] == *newline - 1 {
+                    continue;
+                }
+                if n < newlines.len() - 1 && newlines[n + 1] == *newline + 1 {
+                    continue;
+                }
+                single_newlines.push(*newline);
+            }
+            // 从后往前替换，以免替换过程中改变未替换的换行符的位置
+            // Replace in reverse order in order not to change the positions of other newlines during replacements
+            for i in single_newlines.iter().rev() {
+                // 如果换行前面是“-”则不需要空格
+                // If there is a "-" before newline then space is not needed
+                if *i > 0 && content.as_bytes()[*i - 1] == b'-' {
+                    content.replace_range(*i..*i + 1, "");
+                } else {
+                    content.replace_range(*i..*i + 1, to_replace);
+                }
+            }
+        }
     }
 }
