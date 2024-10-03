@@ -117,6 +117,9 @@ pub fn handler(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     // 如果按键不是设置的按键则忽略
                     // If the key is not the setting key, ignore
                     if k != util::key() {
+                        // 仅处理连续双击按键的情况, 时间满足但中间若有其他按键按下则忽略
+                        // Only handle continuous double clicks
+                        double = 0;
                         return;
                     }
                     // 如果在模拟中则忽略
@@ -134,9 +137,6 @@ pub fn handler(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     // 如果按键不是设置的按键则忽略
                     // If the key is not the setting key, ignore
                     if k != util::key() {
-                        // 仅处理连续双击按键的情况, 时间满足但中间若有其他按键按下则忽略
-                        // Only handle continuous double clicks
-                        double = 0;
                         return;
                     }
                     // 如果在模拟中则忽略
@@ -147,14 +147,14 @@ pub fn handler(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
 
                     let now = util::now();
 
-                    if now > fast + 500 {
+                    if now > fast + 200 {
                         fast = 0;
                         return;
                     }
                     fast = 0;
 
                     let old = double;
-                    if now < old + 1000 {
+                    if now < old + 400 {
                         key_notifier.notify_waiters();
                         double = 0;
                     } else {
