@@ -35,11 +35,11 @@ pub async fn translate(content: &str) -> Result<TransVO> {
     // 翻译目标语言
     let lang = lang::lang(content);
 
-    // 转换为 url 编码
-    let content = utf8_percent_encode(content, NON_ALPHANUMERIC).to_string();
-
     // 将多行合并一行
-    let content = content.replace(['\n', '\r'], " ");
+    let content = content.replace(['\n', '\r'], " ").replace("  ", " ");
+
+    // 转换为 url 编码
+    let content = utf8_percent_encode(&content, NON_ALPHANUMERIC).to_string();
     let host = if config::mode() {
         mirror::one()
     } else {
